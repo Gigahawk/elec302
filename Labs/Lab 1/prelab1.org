@@ -1,0 +1,163 @@
+#+TITLE: ELEC302 Pre-Lab 1: Power Supplies and Voltage Regulators
+#+AUTHOR: Jasper Chan - 37467164
+#+LATEX_HEADER: \setlength{\parindent}{0pt}
+#+LATEX_HEADER: \usepackage{float}
+
+\setcounter{section}{1}
+* Filter Capacitor Formulas
+** Half Wave Rectifier
+The voltage ripple $V_r$ formula for a half wave rectifier with an ideal diode is
+
+\begin{equation}
+V_r \approx \frac{V_p}{f R_L C}
+\end{equation}
+
+Rearranging to solve for $C$ gives
+
+\begin{equation}
+C \approx \frac{V_p}{f R_L V_R}
+\end{equation}
+
+Substituting $V_p \leftarrow V_p - V_D$ for a real diode gives
+
+\begin{equation}
+C = \frac{V_p - V_D}{f R_L V_R}
+\end{equation}
+
+** Full Wave Rectifier
+The voltage ripple $V_r$ formula for a full wave rectifier with ideal diodes is
+
+\begin{equation}
+V_r \approx \frac{V_p}{2f R_L C}
+\end{equation}
+
+Rearranging to solve for $C$ gives
+
+\begin{equation}
+C \approx \frac{V_p}{2f R_L V_R}
+\end{equation}
+*** Center Tap
+Substituting $V_p \leftarrow V_p - V_D$ for a center tap configuration gives
+
+\begin{equation}
+C = \frac{V_p - V_D}{f R_L V_R}
+\end{equation}
+
+*** Bridge Circuit
+Substituting $V_p \leftarrow V_p - 2V_D$ for a bridge circuit configuration gives
+
+\begin{equation}
+C = \frac{V_p - 2V_D}{f R_L V_R}
+\end{equation}
+
+
+
+
+
+
+
+\setcounter{section}{3}
+* 5.1V Voltage Regulator
+** Finding $V_{Z0}$
+From the datasheet for the 1N5338B zener diode:
+#+ATTR_LATEX: :align c | c
+| $V_Z$    | 5.1V      |
+|----------+-----------|
+| $Z_{ZT}$ | 1.5\Omega |
+|----------+-----------|
+| $I_{ZT}$ | 240mA     |
+
+Subbing into the function for the piecewise linear model:
+\begin{align}
+V_Z &= V_{Z0} + r_Z I_Z \\
+(5.1 \text{V}) &= V_{Z0} + (1.5\Omega)(240\text{mA}) \\
+\nonumber \\
+V_{Z0} &= 4.74\text{V}
+\end{align}
+** Finding the Series Resistance
+#+BEGIN_SRC ipython :results silent :exports none
+%matplotlib inline
+%config InlineBackend.figure_format = 'svg'
+
+import SchemDraw as schem
+import SchemDraw.elements as e
+
+d = schem.Drawing(unit=2)
+
+d.add(e.VDD, label='V')
+R = d.add(e.RES, label='$R$', d='down')
+d1 = d.add(e.DOT, d='down')
+d.add(e.BAT_CELL, label='$V_{Z0}$')
+r_z = d.add(e.RES, label='$r_Z$')
+d.add(e.GND)
+
+d.add(e.LINE, xy=d1.start, d='right', l=d.unit*1.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_o$')
+R_L = d.add(e.RES,l=d.unit*2, label='$R_L$', d='down')
+d.add(e.GND)
+
+d.labelI(R_L, '$I_L$', top=False, arrowofst=-d.unit*0.19, arrowlen=d.unit*0.7)
+d.labelI(R, '$I$', top=False, arrowofst=-d.unit*0.19, arrowlen=d.unit*0.7)
+d.labelI(r_z, '$I_Z$', top=False, arrowofst=-d.unit*0.19, arrowlen=d.unit*0.7)
+
+d.draw()
+d.save('diagram.svg')
+
+#+END_SRC 
+
+#+ATTR_LATEX: :width 0.4\linewidth :placement [H]
+#+CAPTION: Equivalent circuit diagram for a zener diode voltage regulator label:zener_reg
+[[./diagram.svg]]
+
+At no load, $I_L = 0$ meaning $I = I_Z$.
+If we rearrange the equivalent zener diode in Figure ref:zener_reg we get Figure ref:zener_reg2
+
+#+BEGIN_SRC ipython :results silent :exports none
+%matplotlib inline
+%config InlineBackend.figure_format = 'svg'
+
+import SchemDraw as schem
+import SchemDraw.elements as e
+
+d = schem.Drawing(unit=2)
+
+d.add(e.VDD, label='V')
+R = d.add(e.RES, label='$R$', d='down')
+d1 = d.add(e.DOT, d='down')
+r_z = d.add(e.RES, label='$r_Z$')
+d.add(e.BAT_CELL, label='$V_{Z0}$')
+d.add(e.GND)
+
+d.add(e.LINE, xy=d1.start, d='right', l=d.unit*1.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_o$')
+R_L = d.add(e.RES,l=d.unit*2, label='$R_L$', d='down')
+d.add(e.GND)
+
+d.labelI(R_L, '$I_L$', top=False, arrowofst=-d.unit*0.19, arrowlen=d.unit*0.7)
+d.labelI(R, '$I$', top=False, arrowofst=-d.unit*0.19, arrowlen=d.unit*0.7)
+d.labelI(r_z, '$I_Z$', top=False, arrowofst=-d.unit*0.19, arrowlen=d.unit*0.7)
+
+d.draw()
+d.save('diagram2.svg')
+
+#+END_SRC 
+
+#+ATTR_LATEX: :width 0.4\linewidth :placement [H]
+#+CAPTION: Equivalent circuit diagram for a zener diode voltage regulator with $R$ and $r_Z$ directly in series label:zener_reg2
+[[./diagram2.svg]]
+From this it is obvious that the current $I$ is given by the equation
+
+\begin{equation}
+I = I_Z = \frac{V - V_{Z0}}{R + r_Z}
+\end{equation}
+
+Rearranging for R gives
+
+\begin{align}
+R &= \frac{V - V_{Z0}}{I} - r_Z \\
+&= \frac{(15\text{V}) - (4.74\text{V})}{(66.7\text{mA})} - (1.5\Omega) \\
+&= 152.32\Omega
+\end{align}
+
+
+

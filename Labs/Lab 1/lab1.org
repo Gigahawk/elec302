@@ -1,0 +1,146 @@
+#+TITLE: ELEC302 Lab 1 - Power Supplies and Voltage Regulators
+#+AUTHOR: Jasper Chan - 37467164 @@latex:\\\\@@ Partner: Vivien Hui @@latex:\\\\@@ Lab Group L2B
+#+DATE: Feb 5, 2019
+# No clue why i need the square brackets but whatever
+#+LATEX_CLASS_OPTIONS: [titlepage]
+
+
+#+LATEX_HEADER: \usepackage{siunitx,esvect}
+#+LATEX_HEADER: \setlength{\parindent}{0pt}
+#+LATEX_HEADER: \usepackage{float}
+
+* Task 1: Half-Wave Rectifier and Filter
+** Part 1 label:p1
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Waveform of the transformer output measured from the center terminal to one of the ends. label:center_tap_sine
+[[./center_tap_sine.jpg]]
+
+From Figure ref:center_tap_sine, we can see that  $V_{RMS} \approx 12.1\text{V}$.
+** Part 2
+*** Pure Rectification
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Waveform of the transformer connected to a center tap half wave rectifier. label:center_tap_halfwave
+[[./center_tap_halfwave.jpg]]
+
+From Figure ref:center_tap_halfwave, we can see that  $V_{peak} \approx 16.4\text{V}$.
+We can check this against the measurement in section ref:p1 by calculating the expected $V_{peak}$ from our measured $V_{RMS}$.
+
+\begin{align*}
+V_{peak} &= V_{RMS} \cdot \sqrt{2} - V_{diode}\\
+&= (12.1 \text{V}) \cdot \sqrt{2} - (0.7 \si\volt)\\
+&= 16.41 \text{V} \approx 16.4 \text{V}\\
+\end{align*}
+*** Rectification with Filter Capacitor
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: AC coupled waveform of the center tapped transformer connected to a half wave rectifier with filter capacitor. label:center_tap_halfwave_filtered
+[[./center_tap_halfwave_filtered.jpg]]
+
+From Figure ref:center_tap_halfwave_filtered, we can see that $V_{ripple} \approx 576\si{\milli\volt}$.
+
+During the lab we forgot to measure the average voltage of this system, however it can be approximated by:
+\begin{align*}
+V_{avg} &\approx V_{peak} - \frac{V_{ripple}}{2} \\
+&\approx (16.4 \si\volt) - \frac{(576 \si{\milli\volt})}{2} \\
+&\approx 16.1 \si\volt
+\end{align*}
+
+The ripple in the output is caused by the filter capacitor[fn:capval] being discharged when the rectifier's instantaneous voltage drops below the instantaneous voltage of the filter capacitor. 
+[fn:capval] All measurements were done with a $470 \si{\micro\farad}$ capacitor provided in the lab
+
+
+In order to get $V_{ripple} = 1\si\volt$, we can use equation (3) from the prelab.
+\begin{align*}
+C &= \frac{V_{peak} - V_{diode}}{f \cdot R_{load} \cdot V_{ripple}} \\
+&= \frac{(16.4\si\volt) - (0.7\si\volt)}{(60\si\hertz) \cdot (1\si{\kilo\ohm}) \cdot (1\si\volt)}\\
+&= 262 \si{\micro\farad}
+\end{align*}
+* Task 2: Full-Wave Rectifiers and Filters
+** Part 1
+*** Bridge Rectifier
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Waveform of the outer tapped transformer connected to a full wave bridge rectifier. label:bridge_fullwave
+[[./bridge_fullwave.jpg]]
+
+From Figure ref:bridge_fullwave, we can see that  $V_{peak} \approx 31.2\si\volt$.[fn:resolution]
+[fn:resolution] Note that the voltage increments in figure ref:bridge_fullwave are set to $20.0\si\volt$ per division.
+
+*** Bridge Rectifier with Filter Capacitor
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: AC coupled waveform of the transformer connected to a full wave bridge rectifier with filter capacitor. label:bridge_fullwave_filtered
+[[./bridge_fullwave_filtered.jpg]]
+
+From Figure ref:bridge_fullwave_filtered, we can see that  $V_{ripple} \approx 524\si{\milli\volt}$.[fn:ripple]
+[fn:ripple] Going from a half-wave rectifier to a full-wave rectifier should half the period between capacitor charges, halving the ripple.
+Going from a center tap to an outer tap should double the peak voltage, doubling the ripple.
+Ignoring diode losses, this should result in the same ripple.
+
+
+Again we can calculate $V_{avg}$ with
+\begin{align*}
+V_{avg} &\approx V_{peak} - \frac{V_{ripple}}{2} \\
+&\approx (31.2 \si\volt) - \frac{(524 \si{\milli\volt})}{2} \\
+&\approx 30.9 \si\volt
+\end{align*}
+
+In order to get $V_{ripple} = 1\si\volt$, we can use equation (7) from the prelab.
+\begin{align*}
+C &= \frac{V_{peak} - 2 \cdot V_{diode}}{2f \cdot R_{load} \cdot V_{ripple}} \\
+&= \frac{(31.2\si\volt) - 2 \cdot (0.7\si\volt)}{2(60\si\hertz) \cdot (1\si{\kilo\ohm}) \cdot (1\si\volt)}\\
+&= 248 \si{\micro\farad}
+\end{align*}
+** Part 2
+*** Center Tap Full-Wave Rectifier
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Waveform of the outer tapped transformer connected to a center tap full wave rectifier. label:center_tap_fullwave
+[[./center_tap_fullwave.jpg]]
+
+From Figure ref:center_tap_fullwave, we can see that $V_{peak} \approx 16.4\si\volt$.
+
+*** Center Tap Full-Wave Rectifier with Filter Capacitor
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: AC coupled waveform of the transformer connected to a full wave center tap rectifier with filter capacitor. label:center_tap_fullwave_filtered
+[[./center_tap_fullwave_filtered.jpg]]
+
+From Figure ref:center_tap_fullwave_filtered, we can see that  $V_{ripple} \approx 288\si{\milli\volt}$.
+
+Again we can calculate $V_{avg}$ with
+\begin{align*}
+V_{avg} &\approx V_{peak} - \frac{V_{ripple}}{2} \\
+&\approx (16.4 \si\volt) - \frac{(288 \si{\milli\volt})}{2} \\
+&\approx 16.2 \si\volt
+\end{align*}
+
+In order to get $V_{ripple} = 1\si\volt$, we can use equation (6) from the prelab.
+\begin{align*}
+C &= \frac{V_{peak} -  V_{diode}}{2f \cdot R_{load} \cdot V_{ripple}} \\
+&= \frac{(16.4\si\volt) - 2 \cdot (0.7\si\volt)}{2(60\si\hertz) \cdot (1\si{\kilo\ohm}) \cdot (1\si\volt)}\\
+&= 125 \si{\micro\farad}
+\end{align*}
+* Task 3: Zener Diode Voltage Regulator
+** Average Voltage
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Waveform of the outer tapped transformer connected to a filtered center tap full wave rectifier connected to a zener diode regulator. label:zener
+[[./zener.jpg]]
+
+From Figure ref:zener, we can see that  $V_{avg} \approx 5.2\si{\volt}$.
+** Voltage Ripple
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: AC coupled waveform of the zener diode regulator. label:zener_ripple
+[[./zener_ripple.jpg]]
+
+From Figure ref:zener_ripple, we can see that  $V_{ripple} \approx 3.76\si{\milli\volt}$, which is multiple magnitudes lower than the ripple voltages taken directly from the filtered rectifier outputs.
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+

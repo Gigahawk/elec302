@@ -40,21 +40,15 @@ C \approx \frac{V_p}{2f R_L V_R}
 Substituting $V_p \leftarrow V_p - V_D$ for a center tap configuration gives
 
 \begin{equation}
-C = \frac{V_p - V_D}{f R_L V_R}
+C = \frac{V_p - V_D}{2f R_L V_R}
 \end{equation}
 
 *** Bridge Circuit
 Substituting $V_p \leftarrow V_p - 2V_D$ for a bridge circuit configuration gives
 
 \begin{equation}
-C = \frac{V_p - 2V_D}{f R_L V_R}
+C = \frac{V_p - 2V_D}{2f R_L V_R}
 \end{equation}
-
-
-
-
-
-
 
 \setcounter{section}{3}
 * 5.1V Voltage Regulator

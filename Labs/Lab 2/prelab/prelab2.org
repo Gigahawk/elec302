@@ -1,0 +1,105 @@
+#+TITLE: ELEC302 Pre-Lab 2: Bistable and Monostable Multivibrators
+#+AUTHOR: Jasper Chan - 37467164
+#+LATEX_HEADER: \setlength{\parindent}{0pt}
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \usepackage{steinmetz}
+#+LATEX_HEADER: \usepackage{siunitx}
+
+\setcounter{section}{3}
+* Monostable Multivibrator Pulse Duration
+#+BEGIN_SRC ipython :results silent :exports none
+%matplotlib inline
+%config InlineBackend.figure_format = 'svg'
+
+import SchemDraw as schem
+import SchemDraw.elements as e
+
+d = schem.Drawing(unit=2)
+
+d.add(e.DOT_OPEN, lftlabel='$-V_{ref}$')
+d.add(e.RES, d='right', toplabel='$R_1$')
+d.add(e.LINE, d='down', l=d.unit*0.5)
+V_A = d.add(e.DOT, botlabel='$V_a$')
+d.add(e.CAP2, d='left', botlabel='$C_1$', reverse=True)
+d.add(e.DOT_OPEN, lftlabel='$V_{in}$')
+
+d.add(e.LINE, d='right', l=d.unit*0.5, xy=V_A.start)
+opamp = d.add(e.OPAMP, anchor='in1')
+
+d.add(e.LINE, d='right', l=d.unit*0.5, xy=opamp.out)
+V_out = d.add(e.DOT)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_{out}$')
+
+d.add(e.LINE, d='left', l=d.unit*0.5, xy=opamp.in2)
+d.add(e.LINE, d='down')
+V_B = d.add(e.DOT)
+V_B.add_label('$V_B$', loc='center', ofst=[-0.1, 0.1], align=('right', 'bottom')) 
+
+
+d.add(e.LINE, d='down', xy=V_out.start, toy=V_B.start)
+d.add(e.CAP, d='left', to=V_B.start)
+
+d.add(e.LINE, d='left', xy=V_B.start)
+d.add(e.DIODE, d='down')
+d.add(e.GND)
+
+d.add(e.RES, d='down', xy=V_B.start)
+d.add(e.GND)
+
+
+
+d.draw()
+d.save('monostable.svg')
+
+#+END_SRC
+
+#+CAPTION: A monostable multivibrator circuit
+[[./monostable.svg]]
+First let's assume some initial conditions:[fn:idealopamp] [fn:electrolytic]
+- $V_\text{in} = 0$
+- $V_\text{ref} = 0$
+- $V_\text{out} = V_+$
+
+[fn:idealopamp] For simplicity I'm assuming the opamp is capable of operating all the way to rail voltages, however it would be fairly trivial to substitute in the saturation voltages to these equations. 
+[fn:electrolytic] Because $C_1$ is an electrolytic capacitor, $V_\text{in}$ can never go below $V_\text{ref}$
+
+
+
+
+At these initial conditions, at steady state, the value of $V_a$ will be equal to $-V_\text{ref}$ and $V_b$ will equal $V_\text{diode} = \SI{0.7}{\volt}$ since the diode is forward biased.
+Because $V_a < V_b$, $V_\text{out}$ will equal $V_+$.
+
+If $V_\text{in}$ goes from $V_-$ to $V_+$ at time $t_0$, then $V_a$ will be:
+$$V_a(t) = (V_+ - (-V_\text{ref})) \cdot e^{\frac{-(t-t_0)}{\tau_1}} + (-V_\text{ref})$$
+Where $\tau_1 = R_1 C_1$
+
+Right at $t_0$, $V_a = V_+ > V_b$ and $V_{out}$ will go from $V_+$ to $V_-$ [fn:dioderwd].
+When this happens, $V_b$ will be:
+$$V_b(t) = V_- \cdot e^{\frac{-(t-t_0)}{\tau_2}}$$
+Where $\tau_2 = R_2 C_2$
+
+[fn:dioderwd] Since the ground is at a higher potential than $V_-$, the diode will be reverse biased and act like an open circuit.
+
+
+
+
+At some time $t = T$, $V_a$ and $V_b$ will cross, and the value of $V_{out}$ will return to $V_+$.
+We can calculate $T - t_0$ by[fn:endbehavior]:
+\begin{align*}
+V_a(T) &= V_b(T) \\
+(V_+ - (-V_\text{ref})) \cdot e^{\frac{-(T-t_0)}{\tau_1}} + (-V_\text{ref}) &= V_- \cdot e^{\frac{-(T-t_0)}{\tau_2}} \\
+V_+ \cdot e^{\frac{-(T-t_0)}{\tau_1}} &= V_- \cdot e^{\frac{-(T-t_0)}{\tau_2}} \\
+e^{\left(\frac{-(T-t_0)}{\tau_1} - \frac{-(T-t_0)}{\tau_2}\right)} &= \frac{V_-}{V_+} \\
+\left(\frac{-(T-t_0)}{\tau_1} - \frac{-(T-t_0)}{\tau_2}\right) &= \log{\frac{V_-}{V_+}} \\
+(T - t_0) \cdot \left(-\frac{1}{\tau_1} + \frac{1}{\tau_2}\right) &= \log{\frac{V_-}{V_+}} \\
+(T - t_0) &= \frac{\log{\frac{V_-}{V_+}}}{-\frac{1}{\tau_1} + \frac{1}{\tau_2}} \\
+\end{align*}
+[fn:endbehavior] At time $t = T$, $V_b$ will shoot to $V_+$ and then decay towards $V_\text{diode}$ according to $\tau_2$ due to $V_\text{out}$ returning to its stable state. 
+
+
+
+
+
+Subbing back for component values:
+$$(T - t_0) &= \frac{\log{\frac{V_-}{V_+}}}{-\frac{1}{R_1 C_2} + \frac{1}{R_2 C_2}}$$

@@ -38,13 +38,13 @@ V_B.add_label('$V_B$', loc='center', ofst=[-0.1, 0.1], align=('right', 'bottom')
 
 
 d.add(e.LINE, d='down', xy=V_out.start, toy=V_B.start)
-d.add(e.CAP, d='left', to=V_B.start)
+d.add(e.CAP, d='left', to=V_B.start, label='$C_2$')
 
 d.add(e.LINE, d='left', xy=V_B.start)
-d.add(e.DIODE, d='down')
+d.add(e.DIODE, d='down', label='$D_1$')
 d.add(e.GND)
 
-d.add(e.RES, d='down', xy=V_B.start)
+d.add(e.RES, d='down', xy=V_B.start, label='$R_2$')
 d.add(e.GND)
 
 
@@ -57,12 +57,12 @@ d.save('monostable.svg')
 #+CAPTION: A monostable multivibrator circuit
 [[./monostable.svg]]
 First let's assume some initial conditions:[fn:idealopamp] [fn:electrolytic]
-- $V_\text{in} = 0$
-- $V_\text{ref} = 0$
+- $V_\text{in} = -V_\text{ref}$
+- $R_1 C_1 \lll R_2 C_2$
 - $V_\text{out} = V_+$
 
 [fn:idealopamp] For simplicity I'm assuming the opamp is capable of operating all the way to rail voltages, however it would be fairly trivial to substitute in the saturation voltages to these equations. 
-[fn:electrolytic] Because $C_1$ is an electrolytic capacitor, $V_\text{in}$ can never go below $V_\text{ref}$
+[fn:electrolytic] Because $C_1$ is an electrolytic capacitor, $V_\text{in}$ can never go below $-V_\text{ref}$
 
 
 
@@ -70,30 +70,29 @@ First let's assume some initial conditions:[fn:idealopamp] [fn:electrolytic]
 At these initial conditions, at steady state, the value of $V_a$ will be equal to $-V_\text{ref}$ and $V_b$ will equal $V_\text{diode} = \SI{0.7}{\volt}$ since the diode is forward biased.
 Because $V_a < V_b$, $V_\text{out}$ will equal $V_+$.
 
-If $V_\text{in}$ goes from $V_-$ to $V_+$ at time $t_0$, then $V_a$ will be:
-$$V_a(t) = (V_+ - (-V_\text{ref})) \cdot e^{\frac{-(t-t_0)}{\tau_1}} + (-V_\text{ref})$$
-Where $\tau_1 = R_1 C_1$
+If $V_\text{in}$ goes to $V_+$ at time $t_0$, then $V_a$ will be:
+$$V_a(t) = (V_+ - (-V_\text{ref})) \cdot e^{\frac{-(t - t_0)}{\tau_1}} + (-V_\text{ref})$$
+Where $\tau_1 = R_1 C_1$.
 
 Right at $t_0$, $V_a = V_+ > V_b$ and $V_{out}$ will go from $V_+$ to $V_-$ [fn:dioderwd].
 When this happens, $V_b$ will be:
-$$V_b(t) = V_- \cdot e^{\frac{-(t-t_0)}{\tau_2}}$$
-Where $\tau_2 = R_2 C_2$
+$$V_b(t) = V_- \cdot e^{\frac{-(t - t_0)}{\tau_2}}$$
+Where $\tau_2 = R_2 C_2$.
 
-[fn:dioderwd] Since the ground is at a higher potential than $V_-$, the diode will be reverse biased and act like an open circuit.
+[fn:dioderwd] Since the ground is at a higher potential than $V_-$, the diode will be reverse biased and act like an open circuit while $V_\text{out} < 0$.
 
 
 
 
 At some time $t = T$, $V_a$ and $V_b$ will cross, and the value of $V_{out}$ will return to $V_+$.
+By assuming that $\tau_1 \lll \tau_2$, we can assume that $V_a(T) \approx -V_\text{ref}$.
 We can calculate $T - t_0$ by[fn:endbehavior]:
 \begin{align*}
 V_a(T) &= V_b(T) \\
-(V_+ - (-V_\text{ref})) \cdot e^{\frac{-(T-t_0)}{\tau_1}} + (-V_\text{ref}) &= V_- \cdot e^{\frac{-(T-t_0)}{\tau_2}} \\
-V_+ \cdot e^{\frac{-(T-t_0)}{\tau_1}} &= V_- \cdot e^{\frac{-(T-t_0)}{\tau_2}} \\
-e^{\left(\frac{-(T-t_0)}{\tau_1} - \frac{-(T-t_0)}{\tau_2}\right)} &= \frac{V_-}{V_+} \\
-\left(\frac{-(T-t_0)}{\tau_1} - \frac{-(T-t_0)}{\tau_2}\right) &= \log{\frac{V_-}{V_+}} \\
-(T - t_0) \cdot \left(-\frac{1}{\tau_1} + \frac{1}{\tau_2}\right) &= \log{\frac{V_-}{V_+}} \\
-(T - t_0) &= \frac{\log{\frac{V_-}{V_+}}}{-\frac{1}{\tau_1} + \frac{1}{\tau_2}} \\
+-V_\text{ref} &= V_- \cdot e^{\frac{-(T - t_0)}{\tau_2}} \\
+e^{\frac{-(T - t_0)}{\tau_2}} &= \frac{-V_\text{ref}}{V_-} \\
+\frac{-(T - t_0)}{\tau_2} &= \log{\frac{-V_\text{ref}}{V_-}} \\
+(T - t_0) &= \frac{\log{\frac{-V_\text{ref}}{V_-}}}{-\tau_2} \\
 \end{align*}
 [fn:endbehavior] At time $t = T$, $V_b$ will shoot to $V_+$ and then decay towards $V_\text{diode}$ according to $\tau_2$ due to $V_\text{out}$ returning to its stable state. 
 
@@ -102,4 +101,4 @@ e^{\left(\frac{-(T-t_0)}{\tau_1} - \frac{-(T-t_0)}{\tau_2}\right)} &= \frac{V_-}
 
 
 Subbing back for component values:
-$$(T - t_0) &= \frac{\log{\frac{V_-}{V_+}}}{-\frac{1}{R_1 C_2} + \frac{1}{R_2 C_2}}$$
+$$(T - t_0) = - \frac{\log{\frac{-V_\text{ref}}{V_-}}}{R_2 C_2}$$

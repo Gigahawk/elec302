@@ -62,7 +62,7 @@ C &= \frac{V_{peak} - V_{diode}}{f \cdot R_{load} \cdot V_{ripple}} \\
 [[./bridge_fullwave.jpg]]
 
 From Figure ref:bridge_fullwave, we can see that  $V_{peak} \approx 31.2\si\volt$.[fn:resolution]
-[fn:resolution] Note that the voltage increments in figure ref:bridge_fullwave are set to $20.0\si\volt$ per division.
+[fn:resolution] Note that the voltage increments in Figure ref:bridge_fullwave are set to $20.0\si\volt$ per division.
 
 *** Bridge Rectifier with Filter Capacitor
 #+ATTR_LaTeX: :placement [H]

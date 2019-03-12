@@ -1,4 +1,4 @@
-#+TITLE: ELEC302 Lab 2 - Power Supplies and Voltage Regulators
+#+TITLE: ELEC302 Lab 2 - Bistable and Monostable Multivibrators 
 #+AUTHOR: Jasper Chan - 37467164 @@latex:\\\\@@ Partner: Vivien Hui @@latex:\\\\@@ Lab Group L2B
 #+DATE: Feb 5, 2019
 # No clue why i need the square brackets but whatever

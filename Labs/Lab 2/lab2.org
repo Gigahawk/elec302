@@ -1,0 +1,243 @@
+#+TITLE: ELEC302 Lab 2 - Power Supplies and Voltage Regulators
+#+AUTHOR: Jasper Chan - 37467164 @@latex:\\\\@@ Partner: Vivien Hui @@latex:\\\\@@ Lab Group L2B
+#+DATE: Feb 5, 2019
+# No clue why i need the square brackets but whatever
+#+LATEX_CLASS_OPTIONS: [titlepage]
+
+
+#+LATEX_HEADER: \usepackage{subcaption}
+#+LATEX_HEADER: \usepackage{siunitx,esvect}
+#+LATEX_HEADER: \setlength{\parindent}{0pt}
+#+LATEX_HEADER: \usepackage{float}
+
+* Task 1: Bistable Multivibrator (Schmitt Trigger)
+#+BEGIN_SRC ipython :results silent :exports none
+%matplotlib inline
+%config InlineBackend.figure_format = 'svg'
+
+import SchemDraw as schem
+import SchemDraw.elements as e
+
+d = schem.Drawing(unit=2)
+
+d.add(e.DOT_OPEN, lftlabel='$V_{in}$')
+d.add(e.RES, d='right', toplabel='$R_1$')
+V_p = d.add(e.DOT, botlabel='$V_p$')
+
+d.add(e.LINE, d='up', xy=V_p.start)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+R2 = d.add(e.RES, d='right', toplabel='$R_2$')
+
+d.add(e.LINE, d='right', l=d.unit*0.5, xy=V_p.start)
+opamp = d.add(e.OPAMP, anchor='in2', flip=True)
+
+d.add(e.LINE, d='right', l=d.unit*0.5, xy=opamp.out)
+V_o = d.add(e.DOT)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_{out}$')
+
+d.add(e.LINE, d='up', xy=V_o.start, toy=R2.end)
+d.add(e.LINE, to=R2.end)
+
+d.add(e.LINE, d='left', l=d.unit*0.5, xy=opamp.in1)
+d.add(e.LINE, d='down')
+d.add(e.GND)
+
+d.draw()
+d.save('schmitt.svg')
+
+#+END_SRC
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Non-inverting Schmitt trigger circuit
+[[./schmitt.svg]]
+** Part 1 label:p1
+For the circuit, find expressions of the typical hysteresis trigger points ($V_\text{t1}$ and $V_\text{t2}$) in terms of $R_1$, $R_2$, and the positive and negative op-amp saturation voltages ($L_+$ and $L_-$).
+*** Solution
+Let's assume that initially that $V_\text{out} = L_+$ and $V_\text{in} > V_\text{t1}$.
+$V_p$ will be held at $V_\text{in} + (L_+ - V_\text{in}) \cdot \frac{R_1}{R_1 + R_2}$.
+$V_\text{in} = V_\text{t1}$ occurs when $V_p = 0$.
+\begin{align*}
+V_p &= V_\text{in} + (L_+ - V_\text{in}) \cdot \frac{R_1}{R_1 + R_2} \\
+0 &= V_\text{t1} + (L_+ - V_\text{t1}) \cdot \frac{R_1}{R_1 + R_2} \\
+0 &= V_\text{t1}\left(1 - \frac{R_1}{R_1 + R_2}\right) + L_+ \cdot \frac{R_1}{R_1 + R_2} \\
+V_\text{t1} &=  \frac{L_+ \cdot \frac{R_1}{R_1 + R_2}}{\frac{R_1}{R_1 + R_2} - 1} \\
+&=  \frac{L_+ \cdot R_1}{R_1 - (R_1 + R_2)} \\
+&=  -L_+ \cdot \frac{R_1}{R_2} \\
+\end{align*}
+
+Similarly:
+$$V_\text{t2} = -L_- \cdot \frac{R_1}{R_2}$$
+** Part 2
+Choose $R_1$ and $R_2$ to obtain $V_\text{t2} = | V_\text{t1} | = \SI{3}{\volt}$.
+Note that, due to voltage drops within its internal transistors, the saturation voltages at the output of the 741 op amp are approximately $\pm \SI{14}{\volt}$ with supply voltages of $\pm \SI{15}{\volt}$.
+*** Solution
+Let's pick $R_1 = \SI{1}{\kilo\ohm}$ so that we can calculate the value for $R_2$[fn:labt1res].
+\begin{align*}
+\SI{3}{\volt} &= \SI{14}{\volt} \cdot \frac{\SI{1}{\kilo\ohm}}{R_2} \\
+R_2 &= \SI{14}{\volt} \cdot \frac{\SI{1}{\kilo\ohm}}{\SI{3}{\volt}} \\
+&= \SI{4.67}{\kilo\ohm}
+\end{align*}
+
+
+[fn:labt1res] During the lab we used resistor values $R_1 = \SI{1}{\kilo\ohm}$ and $R_2 = \SI{5}{\kilo\ohm}$
+\setcounter{subsection}{3}
+** Part 4
+Connect the \mbox{CH 1} probe to $V_\text{in}$ and the \mbox{CH 2} probe to $V_\text{out}$.
+Change the display mode of the oscilloscope to XY mode and set \mbox{CH 1} and \mbox{CH 2} voltage settings to appropriate values.
+What is the minimum peak-to-peak value of $V_\text{in}$ in order to observe the trigger points of the hysteresis loop?
+*** Solution
+#+COMMENT: Probably not quite the right way to do this but whatever
+#+CAPTION: Oscilloscope traces from Task 1 label:oscopet1
+#+ATTR_LATEX: :environment subfigure :width 0.5\textwidth :align c
+| [[./t1a.jpg]] | Hysteresis loop |
+| Measured waveform values | [[./t1b.jpg]] |
+** Part 5
+Plot DC transfer characteristic of the Schmitt trigger.
+Measure $L_+$, $L_-$, $V_\text{t1}$, and $V_\text{t2}$.
+Compare your measurements with the theoretical values.
+Comment on any discrepancies and possible factors that may have caused them.
+*** Solution label:t1sol
+From Figure ref:oscopet1 (b)[fn:invert]:
+#+ATTR_LATEX: :align l | l
+| $L_+$         | \SI{15}{\volt}    |
+| $L_-$         | \SI{-14.2}{\volt} |
+| $V_\text{t1}$ | \SI{3.28}{\volt}  |
+| $V_\text{t2}$ | \SI{-2.88}{\volt} |
+[fn:invert] While taking the picture \mbox{CH 2} was set to display an inverted waveform, hence the reversed trigger voltages
+
+
+
+
+Taking the average saturation voltage $L_\text{avg} = \SI{14.6}{\volt}$, we would expect the triggering voltage to be:
+\begin{align*}
+V_\text{t} &= L\frac{R_1}{R_2} \\
+&= (\SI{14.6}{\volt})\frac{(\SI{1}{\kilo\ohm})}{(\SI{5}{\kilo\ohm})} \\
+&= \SI{2.92}{\volt}
+\end{align*}
+
+Given that the resistors used only had a precision of 5%, the theoretical and measured values do agree.
+It should be noted that the oscilloscope trace appears to show that there is some slight positive DC offset in the circuit, since both the function generator and the Schmitt trigger appear to have max values with a larger magnitude than minimum values[fn:invert].
+
+* Task 2: Monostable Multivibrator
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=2)
+
+d.add(e.DOT_OPEN, lftlabel='$-V_{ref}$')
+d.add(e.RES, d='right', toplabel='$R_1$')
+d.add(e.LINE, d='down', l=d.unit*0.5)
+V_A = d.add(e.DOT, botlabel='$V_a$')
+d.add(e.CAP2, d='left', botlabel='$C_1$', reverse=True)
+d.add(e.DOT_OPEN, lftlabel='$V_{in}$')
+
+d.add(e.LINE, d='right', l=d.unit*0.5, xy=V_A.start)
+opamp = d.add(e.OPAMP, anchor='in1')
+
+d.add(e.LINE, d='right', l=d.unit*0.5, xy=opamp.out)
+V_out = d.add(e.DOT)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_{out}$')
+
+d.add(e.LINE, d='left', l=d.unit*0.5, xy=opamp.in2)
+d.add(e.LINE, d='down')
+V_B = d.add(e.DOT)
+V_B.add_label('$V_B$', loc='center', ofst=[-0.1, 0.1], align=('right', 'bottom')) 
+
+
+d.add(e.LINE, d='down', xy=V_out.start, toy=V_B.start)
+d.add(e.CAP, d='left', to=V_B.start, label='$C_2$')
+
+d.add(e.LINE, d='left', xy=V_B.start)
+d.add(e.DIODE, d='down', label='$D_1$')
+d.add(e.GND)
+
+d.add(e.RES, d='down', xy=V_B.start, label='$R_2$')
+d.add(e.GND)
+
+
+
+d.draw()
+d.save('monostable.svg')
+
+#+END_SRC
+
+#+CAPTION: A monostable multivibrator circuit
+[[./monostable.svg]]
+
+\setcounter{subsection}{-1}
+** Correction From Prelab
+In the submitted prelab, the pulse width $T$ is listed as:
+$$T = -R_2 C_2 \cdot \log{\frac{-V_\text{ref}}{(V_- - (V_+ - V_\text{diode}))}}$$
+
+This is slightly incorrect, since at steady state the diode will conduct zero current, and hence have no voltage.
+The correct pulse width formula should be:
+$$T = -R_2 C_2 \cdot \log{\frac{-V_\text{ref}}{(V_- - V_+)}}$$
+** Part 1
+Choose $-V_\text{ref}$, $R_1$, $C_1$, $R_2$, and $C_2$ to obtain a pulse width of \SI{1}{\milli\second}.
+You can generate $-V_\text{ref}$ by using a potentiometer as a voltage divider between $V_+$ and $V_-$.
+Obtain the required components and assemble the circuit.
+*** Solution
+Using the average saturation voltage from section ref:t1sol and picking $R_2 = \SI{3.3}{\kilo\ohm}$, we can calculate a value for $C_2$[fn:labt2vals]
+\begin{align*}
+(\SI{1}{\milli\second}) &= -(\SI{3.3}{\kilo\ohm}) C_2 \cdot \log{\frac{-(\SI{1.2}{\volt})}{((\SI{-14.6}{\volt}) - (\SI{14.6}{\volt}))}} \\
+C_2  &= \frac{(\SI{1}{\milli\second})}{-(\SI{3.3}{\kilo\ohm}) \cdot \log{\frac{-(\SI{1.2}{\volt})}{((\SI{-14.6}{\volt}) - (\SI{14.6}{\volt}))}}} \\
+&= \SI{94.93}{\nano\farad}
+\end{align*}
+
+[fn:labt2vals] During the lab we used component values $R_1 = \SI{220}{\ohm}$, $R_2 = \SI{3.3}{\kilo\ohm}$, $C_1 = \SI{0.68}{\micro\farad}$, $C_2 = \SI{100}{\nano\farad}$, $V_\text{ref} = \SI{1.2}{\volt}$
+
+
+
+** Part 2
+Connect the signal generator output to $V_\text{in}$ and select a square wave of \SI{200}{\hertz} frequency and $10\text{V}_\text{pp}$ amplitude.
+Observe and plot the voltage waveforms at nodes $V_\text{in}$, $A$, $B$, and $V_{out}$, indicating key voltage levels and time relationships.
+Measure the width of the output pulse.
+(Note that this is the negative portion of the output waveform.)
+*** TODO Solution
+#+CAPTION: Oscilloscope trace of $V_\text{out}$ \mbox{(CH 1)} and $V_\text{in}$ \mbox{(CH 2)}
+[[./t2inout.jpg]]
+#+CAPTION: Oscilloscope trace of $A$
+[[./t2A.jpg]]
+#+CAPTION: Oscilloscope trace of $B$
+[[./t2B.jpg]]
+#+CAPTION: Oscilloscope measurement of pulse width $T$
+[[./t2T.jpg]]
+** Part 3
+Compare your observation with the predicted pulse width and comment on any discrepancies.
+*** 
+First let's calculate the predicted pulse width for the components used in the lab
+
+\begin{align*}
+T &= -(\SI{3.3}{\kilo\ohm}) (\SI{100}{\nano\farad}) \cdot \log{\frac{-(\SI{1.2}{\volt})}{((\SI{-14.6}{\volt}) - (\SI{14.6}{\volt}))}} \\
+&= \SI{1.053}{\milli\second}
+\end{align*}
+
+This is almost half of our measured value.
+
+A likely cause for this can be seen by looking back at the pulse width formula.
+the parameter of the $\log$ function is significantly less than 1, where $\frac{d}{dx} \log{x} \rightarrow \infty$.
+Hence a small error in $V_\text{ref}$, or more likely, the saturation voltage, will cause a large error in the calculated step width.
+** Part 4
+Slowly increase the frequency to \SI{1}{\kilo\hertz} and observe the output.
+What is the pulse width at the frequency \SI{1}{\kilo\hertz}?
+Based on your observation and your knowledge of circuit operation,
+explain why the pulse width is different from that measured in step 2.
+You can look at the voltage waveforms at other nodes of the circuit for more clues. Increasing the input frequency might also help you to find the answer.
+*** Solution
+#+CAPTION: Oscilloscope trace of $V_\text{out}$ at an increased frequency on $V_\text{in}$
+[[./t2overdrive.jpg]]
+
+At around \SI{295}{\hertz} (i.e. half the inverse of the initial measured pulse width), the pulse width begins to shrink.
+This happens because the input signal causes the monostable circuit to reset and retrigger before it has returned to steady state on its own.
+More specifically, $C_2$ is not given enough time to fully discharge before the $V_{in}$ falls back down to its low state.
+
+
+
+
+
+
+
+
+
+
+
+

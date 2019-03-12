@@ -160,6 +160,7 @@ d.save('monostable.svg')
 
 #+END_SRC
 
+#+ATTR_LaTeX: :placement [H]
 #+CAPTION: A monostable multivibrator circuit
 [[./monostable.svg]]
 
@@ -192,18 +193,29 @@ Connect the signal generator output to $V_\text{in}$ and select a square wave of
 Observe and plot the voltage waveforms at nodes $V_\text{in}$, $A$, $B$, and $V_{out}$, indicating key voltage levels and time relationships.
 Measure the width of the output pulse.
 (Note that this is the negative portion of the output waveform.)
-*** TODO Solution
-#+CAPTION: Oscilloscope trace of $V_\text{out}$ \mbox{(CH 1)} and $V_\text{in}$ \mbox{(CH 2)}
+*** Solution
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Oscilloscope trace of $V_\text{out}$ \mbox{(CH 1)} and $V_\text{in}$ \mbox{(CH 2)} label:t2inout
 [[./t2inout.jpg]]
-#+CAPTION: Oscilloscope trace of $A$
+From Figure ref:t2inout we can see that once the monostable circuit is triggered by a positive edge on $V_{in}$, $V_\text{out}$ goes to it's low state $L_-$ for its pulse width $T$ before returning to its stable state at $L_+$.
+
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Oscilloscope trace of $A$ label:t2A
 [[./t2A.jpg]]
-#+CAPTION: Oscilloscope trace of $B$
+From Figure ref:t2A we can see that the negating input to the opamp is brought back to zero after each edge transition.
+
+#+ATTR_LaTeX: :placement [H]
+#+CAPTION: Oscilloscope trace of $B$ label:t2B
 [[./t2B.jpg]]
+From Figure ref:t2B we can see that when the monostable circuit is triggered the voltage at $B$ decays through $C_2$ until it matches the voltage at $A$, resetting.
+The reset point can be seen by the small upwards bump at the end of each cycle.
+
+#+ATTR_LaTeX: :placement [H]
 #+CAPTION: Oscilloscope measurement of pulse width $T$
 [[./t2T.jpg]]
 ** Part 3
 Compare your observation with the predicted pulse width and comment on any discrepancies.
-*** 
+*** Solution
 First let's calculate the predicted pulse width for the components used in the lab
 
 \begin{align*}
@@ -216,6 +228,9 @@ This is almost half of our measured value.
 A likely cause for this can be seen by looking back at the pulse width formula.
 the parameter of the $\log$ function is significantly less than 1, where $\frac{d}{dx} \log{x} \rightarrow \infty$.
 Hence a small error in $V_\text{ref}$, or more likely, the saturation voltage, will cause a large error in the calculated step width.
+
+Another potential cause for error can be seen in Figure ref:t2A.
+It appears that at an input frequency of \SI{200}{\hertz} the voltage at $A$ takes the entire half cycle if not more to fully reach zero, meaning that the voltage waveforms at $A$ and $B$ may have met before $A$ was allowed to reach steady state.
 ** Part 4
 Slowly increase the frequency to \SI{1}{\kilo\hertz} and observe the output.
 What is the pulse width at the frequency \SI{1}{\kilo\hertz}?
@@ -223,21 +238,10 @@ Based on your observation and your knowledge of circuit operation,
 explain why the pulse width is different from that measured in step 2.
 You can look at the voltage waveforms at other nodes of the circuit for more clues. Increasing the input frequency might also help you to find the answer.
 *** Solution
+#+ATTR_LaTeX: :placement [H]
 #+CAPTION: Oscilloscope trace of $V_\text{out}$ at an increased frequency on $V_\text{in}$
 [[./t2overdrive.jpg]]
 
 At around \SI{295}{\hertz} (i.e. half the inverse of the initial measured pulse width), the pulse width begins to shrink.
 This happens because the input signal causes the monostable circuit to reset and retrigger before it has returned to steady state on its own.
 More specifically, $C_2$ is not given enough time to fully discharge before the $V_{in}$ falls back down to its low state.
-
-
-
-
-
-
-
-
-
-
-
-

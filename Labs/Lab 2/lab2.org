@@ -89,8 +89,8 @@ What is the minimum peak-to-peak value of $V_\text{in}$ in order to observe the 
 #+COMMENT: Probably not quite the right way to do this but whatever
 #+CAPTION: Oscilloscope traces from Task 1 label:oscopet1
 #+ATTR_LATEX: :environment subfigure :width 0.5\textwidth :align c
-| [[./t1a.jpg]] | Hysteresis loop |
-| Measured waveform values | [[./t1b.jpg]] |
+| [[./t1a.jpg]]  | Measured waveform values |
+| Hysteresis loop | [[./t1b.jpg]] |
 ** Part 5
 Plot DC transfer characteristic of the Schmitt trigger.
 Measure $L_+$, $L_-$, $V_\text{t1}$, and $V_\text{t2}$.

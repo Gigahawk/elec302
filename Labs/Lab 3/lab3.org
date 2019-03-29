@@ -1,0 +1,328 @@
+#+TITLE: ELEC302 Lab 3 - Bipolar Junction Transistor (BJT) and Amplifier 
+#+AUTHOR: Jasper Chan - 37467164 @@latex:\\\\@@ Partner: Vivien Hui @@latex:\\\\@@ Lab Group L2B
+#+DATE: Feb 5, 2019
+# No clue why i need the square brackets but whatever
+#+LATEX_CLASS_OPTIONS: [titlepage]
+
+
+#+LATEX_HEADER: \usepackage{siunitx,esvect}
+#+LATEX_HEADER: \setlength{\parindent}{0pt}
+#+LATEX_HEADER: \usepackage{float}
+
+#+BEGIN_SRC ipython :results silent :exports none
+%matplotlib inline
+%config InlineBackend.figure_format = 'svg'
+
+import SchemDraw as schem
+import SchemDraw.elements as e
+#+END_SRC
+* Task 1: DC Circuit Design and Measurement I
+For the circuit shown in Fig. 3.1, calculate $R_C$ and $R_B$ so that $V_{CE} = \SI{3.0}{\volt}$ and $I_C = \SI{10}{\milli\ampere}$.
+For the first try, you can assume $\beta=100$.
+Assemble the circuit.
+Measure and record the values of $I_C$, $I_B$, $V_{CE}$.
+Draw the circuit indicating the values of all the parameters and the elements used in the circuit.
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=2)
+
+bjt = d.add(e.BJT_NPN, label=['−', '', '$V_{CE} = 3V$', '', '', '+'])
+
+R_C = d.add(e.RES, xy=bjt.collector, d='up', label='$R_C$')
+d.add(e.VDD, label='5V')
+d.labelI(R_C, '$I_C = 10mA$', reverse=True, top=False, arrowlen=d.unit*0.7)
+
+d.add(e.RES, xy=bjt.base, d='left', label='$R_B$')
+d.add(e.LINE, d='up')
+d.add(e.VDD, label='5V')
+
+d.add(e.LINE, xy=bjt.emitter, d='down', l=d.unit*0.5)
+d.add(e.GND)
+
+
+d.draw()
+d.save('task1.svg')
+
+#+END_SRC
+\renewcommand{\thefigure}{3.1}
+#+CAPTION: A BJT circuit biased with two resistors
+#+ATTR_LATEX: :width 0.5\textwidth :placement [H]
+[[./task1.svg]]
+** Solution
+From the prelab:
+\begin{align*}
+R_C &= \SI{200}{\ohm} & R_B &= \SI{43}{\kilo\ohm}
+\end{align*}
+However we had slightly different value components during the lab:
+\begin{align*}
+R_C &= \SI{197.13}{\ohm} & R_B &= \SI{42.75}{\kilo\ohm}
+\end{align*}
+The measured values were:
+\begin{align*}
+I_C &= \SI{16.64}{\milli\ampere} & I_B &= \SI{0.100}{\milli\ampere} & V_{CE} &= \SI{1.7}{\volt}
+\end{align*}
+
+From this, we can calculate $\beta$:
+\begin{align*}
+\beta &= \frac{I_C}{I_B} \\
+&= \frac{(\SI{16.64}{\milli\ampere})}{(\SI{0.100}{\milli\ampere})} \\
+&= 166.4
+\end{align*}
+
+In order to get $V_{CE} = \SI{3}{\volt}$ and $I_{C} = \SI{10}{\milli\ampere}$, we need to find a new $R_B$.
+\begin{align*}
+R_B &= \frac{V_{CC} - V_B}{I_B} \\
+I_B &= \frac{I_C}{\beta} \\
+R_B &= \frac{V_{CC} - V_B}{\frac{I_C}{\beta}} \\
+&= \frac{(\SI{5}{\volt}) - (\SI{0.7}{\volt})}{(\SI{10}{\milli\ampere})}(166.4) \\
+&= \SI{71.55}{\kilo\ohm}
+\end{align*}
+
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=2)
+
+bjt = d.add(e.BJT_NPN, label=['−', '', '$V_{CE} = 3V$', '', '', '+'])
+
+R_C = d.add(e.RES, xy=bjt.collector, d='up', label='$R_C = 200 \Omega$')
+d.add(e.VDD, label='5V')
+d.labelI(R_C, '$I_C = 10mA$', reverse=True, top=False, arrowlen=d.unit*0.7)
+
+d.add(e.RES, xy=bjt.base, d='left', botlabel='$R_B = 71.55 k\Omega$', l=d.unit*1.75)
+d.add(e.LINE, d='up')
+d.add(e.VDD, label='5V')
+
+d.add(e.LINE, xy=bjt.emitter, d='down', l=d.unit*0.5)
+d.add(e.GND)
+
+
+d.draw()
+d.save('task1_sol.svg')
+
+#+END_SRC
+\renewcommand{\thefigure}{1}
+#+CAPTION: Circuit Diagram for Task 1
+#+ATTR_LATEX: :width 0.6\textwidth :placement [H]
+[[./task1_sol.svg]]
+* Task 2: DC Circuit Design and Measurement II
+For the circuit shown in Fig. 3.2, select $R_1 = R_2 = R$, and $R_C$ so that $V_C = \SI{5}{\volt}$ and $I_C = \SI{5}{\milli\ampere}$.
+Assemble the circuit using the same transistor you used in the previous task, for which you should have a very good value of $\beta$ from the measurement that can be used for the resistor selection.
+Measure and record $I_C$, $I_B$, $I_E$, $V_E$ (the voltage across resistor $R_E$), and $V_C$.
+Draw the circuit indicating the values of all the parameters and the elements used for the circuit.
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=2)
+
+bjt = d.add(e.BJT_NPN)
+
+R_C = d.add(e.RES, xy=bjt.collector, d='up', label='$R_C$')
+d.add(e.LINE, d='left', l=d.unit*0.5)
+d.add(e.DOT)
+d.add(e.VDD, label='10V')
+d.add(e.LINE, d='left', l=d.unit*0.5)
+d.add(e.RES, d='down', toy=bjt.base, label='$R_1 = R$')
+b = d.add(e.DOT)
+d.add(e.LINE, to=bjt.base)
+
+d.add(e.RES, xy=bjt.emitter, d='down', label='$R_E$')
+d.add(e.LINE, d='left', l=d.unit*0.5)
+d.add(e.DOT)
+d.add(e.GND)
+d.add(e.LINE, d='left', l=d.unit*0.5)
+d.add(e.RES, d='up', toy=bjt.base, label='$R_2 = R$')
+
+d.add(e.DOT, xy=bjt.collector)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_C$')
+
+
+d.draw()
+d.save('task2.svg')
+
+#+END_SRC
+
+\renewcommand{\thefigure}{3.2}
+#+CAPTION: A BJT circuit biased using four resistors
+#+ATTR_LATEX: :width 0.4\textwidth :placement [H]
+[[./task2.svg]]
+** Solution
+Using the components provided to the lab:
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=2)
+
+bjt = d.add(e.BJT_NPN)
+
+R_C = d.add(e.RES, xy=bjt.collector, d='up', botlabel='$R_C = 0.983 k\Omega$', l=d.unit*2)
+d.labelI(R_C, '$I_C = 5.39 mA$', arrowlen=-d.unit)
+d.add(e.LINE, d='left', l=d.unit*1.5)
+d.add(e.DOT)
+d.add(e.VDD, label='10.059V')
+d.add(e.LINE, d='left', l=d.unit*1.5)
+d.add(e.RES, d='down', toy=bjt.base, label='$R_1 = 118.75 k\Omega$')
+b = d.add(e.DOT)
+ib = d.add(e.LINE, to=bjt.base)
+d.labelI(ib, '$I_B = 0.031 mA$')
+
+R_E = d.add(e.RES, xy=bjt.emitter, d='down', botlabel='$R_E = 0.4629 k\Omega$', l=d.unit*2)
+d.labelI(R_E, '$I_E = 5.42 mA$', arrowofst=-d.unit*0.2)
+d.add(e.LINE, d='left', l=d.unit*1.5)
+d.add(e.DOT)
+d.add(e.GND)
+d.add(e.LINE, d='left', l=d.unit*1.5)
+d.add(e.RES, d='up', toy=bjt.base, label='$R_2 = 119.75 k\Omega$')
+
+d.add(e.DOT, xy=bjt.collector)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_C = 4.763V$')
+
+d.add(e.DOT, xy=bjt.emitter)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.DOT_OPEN, rgtlabel='$V_E = 2.510V$')
+
+d.draw()
+d.save('task2_sol.svg')
+
+#+END_SRC
+
+\renewcommand{\thefigure}{3.2}
+#+CAPTION: A BJT circuit biased using four resistors
+#+ATTR_LATEX: :width 0.7\textwidth :placement [H]
+[[./task2_sol.svg]]
+
+
+* Task 3: Small Signal Amplifier
+Using the same biasing resistors selected for the previous task, assemble the BJT amplifier shown in Fig 3.3.
+$v_s$ is the function generator, producing a sine wave at \SI{1}{\kilo\hertz} with the amplitude of \SI{20}{\milli\volt}.
+Since you will not have capacitors of infinite capacitance, choose a suitable capacitor for the working frequency (make $|1/(j\omega C)|$ sufficiently small for the working frequency, but not too small that the capacitor takes a long time to charge - consult with the TA/instructor for the selection and availibility).
+Sketch the input and output waveforms into your report.
+Calculate the gain of the amplifier given by $A_v = v_o/v_s$, where $v_s$ and $v_o$ are measured quantities.
+Decrease the power supply voltage to \SI{4}{\volt} and repeat the measurement for $A_v$.
+Discuss the observation.
+Also, recalculate the theoretical $A_v$ using the actual value of $\beta$ obtained in Task 1 for the \SI{10}{\volt} power supply case (same as pre-lab task #3 but using the actual $\beta$), compare the obtained $A_v$ with the above measured $A_v$, and discuss the result.
+
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=2)
+
+bjt = d.add(e.BJT_NPN)
+
+R_C = d.add(e.RES, xy=bjt.collector, d='up', label='$R_C$')
+d.add(e.LINE, d='left', l=d.unit*0.5)
+d.add(e.DOT)
+d.add(e.VDD, label='10V')
+d.add(e.LINE, d='left', l=d.unit*0.5)
+d.add(e.RES, d='down', toy=bjt.base, label='$R_1 = R$')
+b = d.add(e.DOT)
+d.add(e.LINE, to=bjt.base)
+
+d.add(e.RES, xy=bjt.emitter, d='down', label='$R_E$')
+d.add(e.LINE, d='left', l=d.unit*0.5)
+gnd = d.add(e.DOT)
+d.add(e.GND)
+d.add(e.LINE, d='left', l=d.unit*0.5)
+d.add(e.RES, d='up', toy=bjt.base, label='$R_2 = R$')
+
+d.add(e.DOT, xy=bjt.collector)
+d.add(e.CAP, label='$\infty$', l=d.unit*2)
+d.add(e.DOT)
+d.push()
+d.add(e.RES, d='down', botlabel='$R_L = 100 k\Omega$')
+d.add(e.GND)
+d.pop()
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.DOT_OPEN, label='$v_o$')
+
+d.add(e.DOT, xy=bjt.emitter)
+d.add(e.LINE, d='right', l=d.unit*0.5)
+d.add(e.CAP, d='down', botlabel='$\infty$')
+d.add(e.LINE, d='left', tox=bjt.emitter)
+d.add(e.DOT)
+
+d.add(e.CAP, d='left', xy=b.start, label='$\infty$')
+d.add(e.RES, label='$R_s = 10 k\Omega$', l=d.unit*1.25)
+d.add(e.SOURCE_SIN, d='down', label='$v_s$', toy=gnd.start)
+d.add(e.LINE, d='right', tox=b.start)
+d.add(e.DOT)
+
+d.draw()
+d.save('task3.svg')
+
+
+#+END_SRC
+
+\renewcommand{\thefigure}{3.3}
+#+CAPTION: A common emitter BJT amplifier
+#+ATTR_LATEX: :width 0.8\textwidth :placement [H]
+[[./task3.svg]]
+** Solution
+*** Calculating reasonable capacitances
+Let's say that "sufficiently small" is 100 times smaller.
+We can use that definition to find our capacitances:
+$$R \ggg \frac{1}{2\pi f C} \rightarrow R > \frac{100}{2\pi f C}$$
+\begin{align*}
+C_E &> \frac{100}{2\pi f R_E} \\
+&> \frac{100}{2\pi (\SI{1}{\kilo\hertz}) (\SI{0.4629}{\kilo\ohm})} \\
+&> \SI{34.38}{\micro\farad}
+\end{align*}
+
+However, for the actual lab, we were provided with these components:
+\begin{align*}
+C_B &= \SI{1.5}{\micro\farad} &
+C_E &= \SI{10}{\micro\farad} &
+C_C &= \SI{1.5}{\micro\farad}
+\end{align*}
+
+*** Measuring $A_v$
+\renewcommand{\thefigure}{2}
+#+CAPTION: Input (CH1) and output (CH2) waveform of BJT amplifier label:t3a
+#+ATTR_LATEX: :placement [H]
+[[./task3_10v.jpg]]
+
+From Figure ref:t3a, we can find $A_v$:
+\begin{align*}
+A_V &= \frac{v_o}{v_s} \\
+&= \frac{\left(\frac{\SI{-524}{\milli\volt}}{2}\right)}{\left(\frac{\SI{38.8}{\milli\volt}}{2}\right)} \\
+&= -13.5
+\end{align*}
+
+*** Measuring $A_v$ at $V_{CC} = \SI{4}{\volt}$
+\renewcommand{\thefigure}{3}
+#+CAPTION: Input (CH1) and output (CH2) waveform of BJT amplifier with $V_{CC}$ set to \SI{4}{\volt} label:t3b
+#+ATTR_LATEX: :placement [H]
+[[./task3_4v.jpg]]
+
+From Figure ref:t3b, we can find $A_v$:
+\begin{align*}
+A_v\biggr\rvert_{V_{CC}=\SI{4}{\volt}} &= \frac{v_o}{v_s} \\
+&= \frac{\left(\frac{\SI{-468}{\milli\volt}}{2}\right)}{\left(\frac{\SI{38.8}{\milli\volt}}{2}\right)} \\
+&= -12.1
+\end{align*}
+
+The value of $A_v$ decreased slightly with the voltage.
+This makes sense since a different voltage will change $I_B$ and $I_C$, leading to a different $\beta$
+*** Calculating theoretical $A_v$
+From Task 1 and Task 2:
+\begin{align*}
+\beta &= 166.4 & I_C &= \SI{5.39}{\milli\ampere} & R_C &= \SI{0.983}{\kilo\ohm} \\
+R_1 &= \SI{118.75}{\kilo\ohm} & R_2 &= \SI{119.75}{\kilo\ohm}
+\end{align*}
+
+$R_s$ and $R_L$ were measured to be \SI{9.787}{\kilo\ohm} and \SI{98.38}{\kilo\ohm} respectively.
+
+With this we can calculate the theoretical $A_v$
+\begin{align*}
+g_m &= \frac{I_C}{V_T} = \frac{(\SI{5.39}{\milli\ampere})}{(\SI{25}{\milli\volt})} \\
+&= \SI{0.2156}{\ampere/\volt} \\
+\\
+r_\pi &= \frac{\beta}{g_m} = \frac{(166.4)}{(\SI{0.2156}{\ampere/\volt})} \\
+&= \SI{771.8}{\ohm} \\
+\\
+A_v &= -g_m (R_C \parallel R_L) \frac{(R_1 \parallel R_2 \parallel r_\pi)}{(R_1 \parallel R_2 \parallel r_\pi) + R_s} \\
+&= -(\SI{0.2156}{\ampere/\volt}) ((\SI{0.983}{\kilo\ohm}) \parallel (\SI{98.38}{\kilo\ohm})) \frac{((\SI{118.75}{\kilo\ohm}) \parallel (\SI{119.75}{\kilo\ohm}) \parallel (\SI{771.8}{\ohm}))}{((\SI{118.75}{\kilo\ohm}) \parallel (\SI{119.75}{\kilo\ohm}) \parallel (\SI{771.8}{\ohm})) + (\SI{9.787}{\kilo\ohm})} \\
+&= -15.16
+\end{align*}
+
+Here we see that the calculated $A_v$ is slightly higher than what was observed.
+This could just be caused by inaccurate measurements of $v_s$ or $v_o$, which had a lot of high frequency noise during the measurement.
+The plots above were taken with the oscilloscope set to averaging mode to filter out this noise, however it may have introduced the error we observe here.
+Of note, $v_{s(Pk-Pk)}$ would only have to be \SI{60}{\milli\volt} higher to give a similar $A_v$
+
+
+
+

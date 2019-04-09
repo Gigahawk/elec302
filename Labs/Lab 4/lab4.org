@@ -3,6 +3,7 @@
 # No clue why i need the square brackets but whatever
 #+LATEX_CLASS_OPTIONS: [titlepage]
 
+#+LATEX_HEADER: \usepackage{subcaption}
 #+LATEX_HEADER: \usepackage{siunitx,esvect}
 #+LATEX_HEADER: \setlength{\parindent}{0pt}
 #+LATEX_HEADER: \usepackage{float}
@@ -44,47 +45,6 @@ MOTOR = {
 #+END_SRC
 * Task 1: Motor Switching
 ** 
-The motor switching circuit is shown in Fig 4.4 (note the voltage source has been changed from \SI{5}{\volt} used in class to \SI{2.5}{\volt} to limit the motor speed).
-First, decouple the inverter circuit (of Q1) from the diode/capacitor peak rectifier _AND_ from the motor drive circuit (of Q2).
-This means that the points "*a*" and "*b*" in Fig 4.5 are disconnected.
-Measure and record $V_O$ in Fig. 4.4 when you provide \SI{0}{\volt} (low state) and \SI{0.7}{\volt} (high state) as $V_I$ to Q1 - check the inverter function and operation mode of Q1, and describe your observation
-#+BEGIN_SRC ipython :results silent :exports none
-d = schem.Drawing(unit=2)
-
-d.add(e.VDD, label='2.5V')
-d.push()
-d.add(e.LINE, d='right')
-d.add(e.LINE, d='down', l=0.25*d.unit)
-d.add(MOTOR, d='down')
-d.add(e.LINE, d='down', l=0.25*d.unit)
-Q2 = d.add(e.BJT_NPN, d='right', anchor='collector', label=[r'$\beta \approx 1000$', 'Q2'])
-d.add(e.LINE, d='down', xy=Q2.emitter)
-gnd2 = d.add(e.GND)
-
-d.pop()
-d.add(e.LINE, d='left')
-d.add(e.RES, d='down', toy=Q2.base, label='$4.7k\Omega$')
-d.add(e.DOT, lftlabel='$V_O$')
-d.push()
-d.add(e.LINE, d='right', to=Q2.base)
-d.pop()
-d.add(e.LINE, d='down', l=0.5*d.unit)
-Q1 = d.add(e.BJT_NPN, d='right', anchor='collector', label=[r'$\beta \approx 100$', 'Q1'])
-d.add(e.LINE, d='down', xy=Q1.emitter, toy=gnd2.start)
-d.add(e.GND)
-
-d.add(e.LINE, d='left', xy=Q1.base, l=0.3*d.unit)
-d.add(e.DOT_OPEN, lftlabel='$V_I$')
-
-d.draw()
-d.save('task1_1.svg')
-
-#+END_SRC
-\renewcommand{\thefigure}{4.4}
-#+CAPTION: Motor switching circuit
-#+ATTR_LATEX: :width 0.5\textwidth :placement [H]
-[[./task1_1.svg]]
-*** Solution
 #+ATTR_LATEX: :align l | l
 | $V_I$                  | $V_O$                      |
 |------------------------+----------------------------|
@@ -92,28 +52,11 @@ d.save('task1_1.svg')
 | \SI{0.7}{\volt} (high) | \SI{35}{\milli\volt} (low) |
 
 ** 
-Keep $V_I$ to be \SI{0.7}{\volt}.
-Set the distance between the rotor wheel and the plastic plate (that the sensor is mounted) to be \SI{\sim 5}{\milli\meter}.
-Re-connect $V_O$ to the Base of Q2 (i.e., reconnect the point "*b*" in Fig. 4.5).
-Connect a \SI{2.5}{\volt} power supply to the motor circuit.
-Vary $V_I$ between \SI{0.7}{\volt} and \SI{0}{\volt} and check if powering to the motor is controlled as you expect.
-*_When you reduce $V_I$ towards \SI{0}{\volt}, do it with caution because the motor/wheel will start to rotate rapidly.*
-Describe your observation.
-After the measurement, turn off the \SI{2.5}{\volt} supply.
-*** Solution
 When $V_I$ approaches \SI{0.7}{\volt}, the motor slows down to a stop.
 When $V_I$ approaches \SI{0.0}{\volt}, the motor speeds up.
 * Task 2: Sensor Signal Amplification and Peak Rectification for Motor Control
 \stepcounter{subsection}
 ** 
-A sensor signal produced by rotating magnets appears as a series of pulses.
-First, decouple the sensor output $V_H(+)$ from the \SI{100}{\nano\farad} DC blocking capacitor (i.e., disconnect the point "*c*" in Fig. 4.5).
-Apply \SI{0}{\volt} to $V_I$ of Q1 and turn on the \SI{2.5}{\volt} supply (the wheel starts to rotate).
-Using an oscilloscope, measure and record the signal generated at the sensor output when the sensor is placed \SI{\sim 2}{\milli\meter} away from the rotating wheel.
-Sketch the waveform on the time axis while showing the approximate peak level observed.
-The signal may not be very stable, but you can take an approximate average of the peak voltage.
-Repeat it when the sensor is set apart, \SI{\sim 5}{\milli\meter} away from the rotating wheel.
-*** Solution
 
 #+BEGIN_EXPORT latex
 \setcounter{figure}{0}
@@ -135,7 +78,34 @@ From Figure ref:task2.2a we can see that the peak voltage level is about \SI{-23
 From Figure ref:task2.2b we can see that the peak voltage level is about \SI{-7.5}{\milli\volt} when the sensor disk is placed \SI{\sim 5}{\milli\meter} away.
 
 ** 
-As noted earlier
+#+COMMENT: Probably not quite the right way to do this but whatever
+#+CAPTION: Oscilloscope traces of hall sensor and amplifier at \SI{\sim 2}{\milli\meter} label:task2.3a
+#+ATTR_LATEX: :environment subfigure :width 0.5\textwidth :align c :placement [H]
+| [[./task2.3_2mm_a.jpg]]          | Measurement of amplified output |
+| Measurement of sensor output | [[./task2.3_2mm_b.jpg]]             |
+
+From Figure ref:task2.3a we can calculate $A_v$
+\begin{align*}
+A_v &= \frac{V_o}{V_s} \\
+&= \frac{\SI{1.68}{\volt}}{\SI{25.4}{\milli\volt}} \\
+&= 66.14
+\end{align*}
+
+#+CAPTION: Oscilloscope traces of hall sensor and amplifier at \SI{\sim 5}{\milli\meter} label:task2.3b
+#+ATTR_LATEX: :environment subfigure :width 0.5\textwidth :align c :placement [H]
+| [[./task2.3_5mm_a.jpg]]          | Measurement of amplified output |
+| Measurement of sensor output | [[./task2.3_5mm_b.jpg]]             |
+
+From Figure ref:task2.3b we can calculate $A_v$
+\begin{align*}
+A_v &= \frac{V_o}{V_s} \\
+&= \frac{\SI{1.02}{\volt}}{\SI{12.2}{\milli\volt}} \\
+&= 83.6
+\end{align*}
+*** Theoretical Value of $A_v$
+From the datasheet for the GH-600 hall sensor, the output resistance ranges from \SI{580}{\ohms} tp \SI{1700}{\ohms}.
+Taking the average resistance to be $R_s = \SI{1140}{\ohms}$, we can make an equivalent circuit to calculate the theoretical $A_v$
+
 #+BEGIN_EXPORT latex
 \setcounter{figurestore}{\value{figure}}
 \renewcommand{\thefigure}{99}

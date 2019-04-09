@@ -256,9 +256,16 @@ Let's say that "sufficiently small" is 100 times smaller.
 We can use that definition to find our capacitances:
 $$R \ggg \frac{1}{2\pi f C} \rightarrow R > \frac{100}{2\pi f C}$$
 \begin{align*}
+C_B &> \frac{100}{2\pi f (R_1 \parallel R_2)} &
 C_E &> \frac{100}{2\pi f R_E} \\
+&> \frac{100}{2\pi (\SI{1}{\kilo\hertz}) ((\SI{118.75}{\kilo\ohm}) \parallel (\SI{119.75}{\kilo\ohm}))} &
 &> \frac{100}{2\pi (\SI{1}{\kilo\hertz}) (\SI{0.4629}{\kilo\ohm})} \\
-&> \SI{34.38}{\micro\farad}
+&> \SI{266.9}{\pico\farad} &
+&> \SI{34.38}{\micro\farad} \\
+\\
+C_C &> \frac{100}{2\pi f (R_C \parallel R_L)} \\
+&> \frac{100}{2\pi (\SI{1}{\kilo\hertz}) ((\SI{0.983}{\kilo\ohm}) \parallel (\SI{98.38}{\kilo\ohm}))} \\
+&> \SI{16.35}{\micro\farad} \\
 \end{align*}
 
 However, for the actual lab, we were provided with these components:

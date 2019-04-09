@@ -87,8 +87,8 @@ From Figure ref:task2.2b we can see that the peak voltage level is about \SI{-7.
 From Figure ref:task2.3a we can calculate $A_v$
 \begin{align*}
 A_v &= \frac{V_o}{V_s} \\
-&= \frac{\SI{1.68}{\volt}}{\SI{25.4}{\milli\volt}} \\
-&= 66.14
+&= \frac{\SI{1.68}{\volt}}{\SI{-25.4}{\milli\volt}} \\
+&= -66.14
 \end{align*}
 
 #+CAPTION: Oscilloscope traces of hall sensor and amplifier at \SI{\sim 5}{\milli\meter} label:task2.3b
@@ -99,29 +99,202 @@ A_v &= \frac{V_o}{V_s} \\
 From Figure ref:task2.3b we can calculate $A_v$
 \begin{align*}
 A_v &= \frac{V_o}{V_s} \\
-&= \frac{\SI{1.02}{\volt}}{\SI{12.2}{\milli\volt}} \\
-&= 83.6
+&= \frac{\SI{1.02}{\volt}}{\SI{-12.2}{\milli\volt}} \\
+&= -83.6
 \end{align*}
 *** Theoretical Value of $A_v$
-From the datasheet for the GH-600 hall sensor, the output resistance ranges from \SI{580}{\ohms} tp \SI{1700}{\ohms}.
-Taking the average resistance to be $R_s = \SI{1140}{\ohms}$, we can make an equivalent circuit to calculate the theoretical $A_v$
+From the datasheet for the GH-600 hall sensor, the output resistance ranges from \SI{580}{\ohm} tp \SI{1700}{\ohm}.
+Taking the average resistance to be $R_s = \SI{1.14}{\kilo\ohm}$, the experimental $\beta = 166.4$, and the measured $I_C = \SI{1.227}{\milli\ampere}$ we can make an equivalent circuit to calculate the theoretical $A_v$ using the hybrid-\pi model
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=2)
 
-#+BEGIN_EXPORT latex
-\setcounter{figurestore}{\value{figure}}
-\renewcommand{\thefigure}{99}
-#+END_EXPORT
-#+CAPTION: asfdfdf
-[[./task2.2_5mm.jpg]]
+d.add(e.VDD, label='10V')
+d.push()
+d.add(e.LINE, d='right')
+d.add(e.LINE, d='down', l=0.25*d.unit)
+d.add(e.RES, d='down', label='$3.9k\Omega$')
+d.add(e.DOT)
+d.push()
+d.add(e.LINE, d='down', l=0.25*d.unit)
+Q3 = d.add(e.BJT_NPN, d='right', anchor='collector', label=[r'$\beta \approx 166.4$', 'Q3'])
+d.add(e.LINE, d='down', xy=Q2.emitter, l=0.25*d.unit)
+d.add(e.DOT)
+d.push()
+d.add(e.RES, d='down', label='$2.9k\Omega$')
+gnd2 = d.add(e.GND)
+d.pop()
+d.add(e.LINE, d='right')
+d.add(e.CAP, d='down', label='$33\mu F$')
+d.add(e.GND)
 
-#+CAPTION: asfdfdf
-[[./task2.2_5mm.jpg]]
+d.pop()
+d.add(e.CAP, d='right', l=2*d.unit, label='100nF')
+d.add(e.DOT)
+d.push()
+d.add(e.RES, d='down', toy=gnd2.start, label='$100k\Omega$')
+d.add(e.GND)
+d.pop()
+d.add(e.LINE, d='right', l=0.25*d.unit)
+d.add(e.DOT_OPEN, label='$V_O$')
 
-#+CAPTION: asfdfdf
-[[./task2.2_5mm.jpg]]
+d.pop()
+d.add(e.LINE, d='left')
+d.add(e.RES, d='down', toy=Q2.base, label='$56k\Omega$')
+d.add(e.DOT)
+d.push()
+d.add(e.LINE, d='right', to=Q2.base)
+d.pop()
+d.push()
+d.add(e.RES, d='down', toy=gnd2.start, label='$33k\Omega$')
+d.add(e.GND)
+d.pop()
+d.add(e.CAP, d='left', label='100nF')
+d.add(e.RES, label='$1.14k\Omega$')
+d.add(e.SOURCE_V, d='down', toy=gnd2.start, reverse=True, label='$V_s$')
+d.add(e.GND)
 
-#+BEGIN_EXPORT latex
-\setcounter{figure}{\value{figurestore}}
-\renewcommand{\thefigure}{\arabic{figure}}
-#+END_EXPORT
-#+CAPTION: asfdfdf
-[[./task2.2_5mm.jpg]]
+
+d.draw()
+d.save('task2_3a.svg')
+
+#+END_SRC
+
+#+CAPTION: Equivalent amplification circuit for hall sensor input label:task2.3c
+#+ATTR_LATEX: :width 0.8\textwidth
+[[./task2_3a.svg]]
+
+\begin{align*}
+g_m &= \frac{I_C}{V_T} \\
+&= \frac{(\SI{1.227}{\milli\ampere})}{\SI{25}{\milli\volt}} \\
+&= \SI{49.1}{\milli\ampere/\volt} \\
+\\
+r_\pi &= \frac{\beta}{g_m} \\
+&= \frac{(166.4)}{(\SI{49.1}{\milli\ampere/\volt})} \\
+&= \SI{3.39}{\kilo\ohm}
+\end{align*}
+
+#+BEGIN_SRC ipython :results silent :exports none
+d = schem.Drawing(unit=3)
+
+d.add(e.GND)
+d.add(e.SOURCE_V, d='up', label='$V_s$')
+d.add(e.RES, d='right', toplabel='$R_s$', botlabel='$1.14k\Omega$')
+r_in = d.add(e.LINE, l=0.8*d.unit)
+d.add(e.DOT)
+d.push()
+d.add(e.RES, d='down', label='$33k\Omega$')
+d.add(e.GND)
+d.pop()
+d.add(e.LINE, d='right')
+d.add(e.DOT)
+d.push()
+d.add(e.RES, d='down', label='$56k\Omega$')
+d.add(e.GND)
+d.pop()
+d.add(e.LINE, d='right')
+d.add(e.DOT)
+d.add(e.RES, d='down', label=['$r_\pi$', '$3.39k\Omega$'], botlabel=['+','$v_\pi$', '‒'])
+gnd_pi = d.add(e.GND)
+
+gnd_g = d.add(e.GND, xy=(gnd_pi.start[0]+d.unit*1.25, gnd_pi.start[1]))
+d.add(e.SOURCE_CONT_I, d='up', xy=gnd_g.start, label='$g_mv_\pi$')
+d.add(e.DOT)
+d.add(e.LINE, d='right')
+d.add(e.DOT)
+d.push()
+d.add(e.RES, d='down', label=['$R_C$', '$3.9k\Omega$'])
+d.add(e.GND)
+d.pop()
+r_out = d.add(e.LINE, d='right')
+d.add(e.DOT)
+d.push()
+d.add(e.RES, d='down', label=['$R_L$', '$100k\Omega$'])
+d.add(e.GND)
+d.pop()
+d.add(e.LINE, d='right', l=0.25*d.unit)
+d.add(e.DOT_OPEN, label='$V_O$')
+
+d.labelI(r_out, '$R_{out}$', reverse=True)
+d.labelI(r_in, '$R_{in}$')
+
+d.draw()
+d.save('task2_3b.svg')
+#+END_SRC
+
+#+CAPTION: Hybrid-\pi model of Figure ref:task2.3c
+#+ATTR_LATEX: :width \textwidth
+[[./task2_3b.svg]]
+
+\begin{align*}
+R_\text{in} &= (\SI{33}{\kilo\ohm}) \parallel (\SI{56}{\kilo\ohm}) \parallel (\SI{3.39}{\kilo\ohm}) &
+R_\text{out} &= R_C \\ 
+&= \SI{2.91}{\kilo\ohm} &
+&= \SI{3.9}{\kilo\ohm} \\
+\end{align*}
+
+\begin{align*}
+V_O &= -g_m v_\pi (R_C \parallel R_L) \\
+&= -g_m \left(V_s \frac{R_\text{in}}{R_S + R_\text{in}}\right) (R_C \parallel R_L) \\
+\frac{V_O}{V_s} &= -g_m \left(\frac{R_\text{in}}{R_S + R_\text{in}}\right) (R_C \parallel R_L) \\
+A_v &= -g_m \left(\frac{R_\text{in}}{R_S + R_\text{in}}\right) (R_C \parallel R_L) \\
+&=
+-(\SI{49.1}{\milli\ampere/\volt})
+\left(
+  \frac{
+    (\SI{2.91}{\kilo\ohm})
+  }
+  {
+    ((\SI{1.14}{\kilo\ohm}) +
+     (\SI{2.91}{\kilo\ohm}))
+  }
+\right)
+((\SI{3.9}{\kilo\ohm}) \parallel
+ (\SI{100}{\kilo\ohm})) \\
+&= -132.4
+\end{align*}
+
+
+Given the wide range of error for this measurement from noise, resistor precision, as well as the true output resistance of the hall sensor, results do seem to agree.
+** 
+#+CAPTION: Rectified and filtered output signal of amplifier at \SI{\sim 2}{\milli\meter} label:task2.4a
+#+ATTR_LATEX: :placement [H] :width 0.6\textwidth
+[[./task2.4_2mm.jpg]]
+
+#+CAPTION: Rectified and filtered output signal of amplifier at \SI{\sim 5}{\milli\meter} label:task2.4b
+#+ATTR_LATEX: :placement [H] :width 0.6\textwidth
+[[./task2.4_5mm.jpg]]
+
+#+CAPTION: Ripple of rectified and filtered output signal label:task2.4c
+#+ATTR_LATEX: :placement [H] :width 0.6\textwidth
+[[./task2.4_ripple.jpg]]
+
+We can use the measured values from Figures ref:task2.4a and ref:task2.4b to find an approximate $V_\text{diode}$[fn:thislabisstupid].
+
+[fn:thislabisstupid] Because the position of the hall sensor is not exactly the same between Task 2.3 and Task 2.4, these calculations will only give very rough values.
+
+
+#+ATTR_LATEX: :align r | r | r | r
+|                           | $V_d$ [\si{\volt}] | $V_a$ [\si{\volt}] | $V_\text{diode}$ |
+|---------------------------+--------------------+--------------------+------------------|
+| \SI{\sim 2}{\milli\meter} |               1.64 |              0.688 |            0.952 |
+| \SI{\sim 5}{\milli\meter} |               1.02 |              0.374 |            0.646 |
+|---------------------------+--------------------+--------------------+------------------|
+| average                   |                    |                    |            0.799 |
+#+TBLFM: $4=$2 - $3::@4$4=vmean(@2..@3)
+
+From this we can see that $V_\text{diode,avg} = 0.799V$.
+
+As the sensor moves farther away, the output of the rectifier gets lower, which is expected since the input signal from the hall sensor will also be lower when the magnets are farther away.
+
+** 
+#+CAPTION: Input signal to inverter at \SI{\sim 2}{\milli\meter} label:task2.5a
+#+ATTR_LATEX: :placement [H] :width 0.6\textwidth
+[[./task2.5_2mm.jpg]]
+
+#+CAPTION: Input signal to inverter at \SI{\sim 5}{\milli\meter} label:task2.5b
+#+ATTR_LATEX: :placement [H] :width 0.6\textwidth
+[[./task2.5_5mm.jpg]]
+
+When the output of the signal increases in magnitude (i.e. the wheel moves closer to the sensor), the output of the rectifier increases (approaching \SI{\sim 0.7}{\volt}).
+The inverter takes the voltage signal and applies it to the motor.
+Hence, when the signal output is high, the motor slows down, approaching 0 angular velocity, and when it is far away it approaches its max angular velocity
